@@ -1,8 +1,14 @@
 from fastapi import FastAPI
-from handlers.ping import router as ping_router
-from handlers.players import router as players_router
+import logging
+from handlers import routers
+
+
+
 app = FastAPI()
+logging.basicConfig(level=logging.DEBUG)
+
+for router in routers:
+    app.include_router(router=router)
 
 
-app.include_router(router=ping_router)
-app.include_router(router=players_router)
+
