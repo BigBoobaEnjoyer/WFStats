@@ -18,10 +18,10 @@ class PlayerRepository:
     def __init__(self, db_session: Session | AsyncSession):
         self.db_session = db_session
 
-    def get_all_players(self) :
-        query = select(Players)
-        with self.db_session() as session:
-            players: list[Players] = session.execute(query).scalars().all()
+    async def get_all_players(self) :
+        query = select(Players )
+        async with self.db_session() as session:
+            players: list[Players] = (await session.execute(query)).scalars().all()
             print(type(players))
         return players
 

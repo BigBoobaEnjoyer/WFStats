@@ -21,9 +21,7 @@ class AuthService:
             raise UserNotFoundException(UserNotFoundException.detail)
         elif user.password != password:
             raise IncorrectAuthPasswordException
-
         return UserLoginSchema(user_id=user.id, access_token=access_token)
-
 
     def generate_access_token(self, user_id: int) -> str:
         expires_date_unix = (datetime.datetime.now(datetime.UTC) + datetime.timedelta(weeks=1)).timestamp()
@@ -43,7 +41,6 @@ class AuthService:
             )
         except JWTError:
             raise TokenIncorrect
-
         if payload['expire'] < datetime.datetime.now(datetime.UTC).timestamp():
             raise TokenExpired
         return payload['user_id']

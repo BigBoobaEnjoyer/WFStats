@@ -16,18 +16,14 @@ async def login(
         body: UserCreateSchema,
         auth_service: Annotated[AuthService, Depends(get_auth_service)]
 ):
-
     try:
         auth_service.login(body.username, body.password)
-
     except UserNotFoundException as ex:
         raise HTTPException(
             status_code=404
         )
-
     except IncorrectAuthPasswordException as ex:
         raise HTTPException(
             status_code=401
         )
-
     return auth_service.login(body.username, body.password)

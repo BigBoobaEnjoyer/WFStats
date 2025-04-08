@@ -1,18 +1,15 @@
 from typing import Annotated
-
 from fastapi import APIRouter, Depends, HTTPException
 
 from dependecy import (get_players_repository, get_request_user_id, get_wf_api_players_service,
-     get_players_repository_async)
+     get_players_repository_async, get_wf_api_players_service_redis)
 from exceptions.player import PlayerNotFoundException
 from repository import PlayerRepository
 from schema import PlayerInfo
-
 from service.players import  WFApiPlayer
 
+
 router = APIRouter(prefix="/players", tags=["players"])
-
-
 
 @router.post('/new')
 async def create_player(
@@ -62,9 +59,9 @@ async def search_player(
 
 @router.get("/get_all_players")
 async def get_all_players(
-        player_repository: Annotated[PlayerRepository, Depends(get_players_repository)]
+        wf_player_api_service: Annotated[WFApiPlayer, Depends(get_wf_api_players_service_redis)]
 ):
-    return player_repository.get_all_players()
+    return await wf_player_api_service.get_all_players()
 
 @router.get('/player_progress_check')
 async def player_progress_check(

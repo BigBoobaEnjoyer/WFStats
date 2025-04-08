@@ -2,14 +2,16 @@ from fastapi import Depends, Request, security, HTTPException
 from fastapi.params import Security
 from sqlalchemy.orm import Session
 
+from cache.repository import PlayerCacheRepository
 from database.database import get_db_session, get_async_db_session
 from exceptions.auth import TokenExpired, TokenIncorrect
 from repository.player import PlayerRepository
 from repository.user import UserRepository
 from service.auth import AuthService
-from service.players import PlayerService, WFApiPlayer
+from service.players import WFApiPlayer
 from service.user import UserService
 from settings import Settings
+from cache.accessor import get_cache_session
 
 
 def get_players_repository() -> PlayerRepository:
@@ -20,10 +22,24 @@ def get_players_repository_async() -> PlayerRepository:
     db_session = get_async_db_session()
     return PlayerRepository(db_session)
 
+def get_player_cache_repository() -> PlayerCacheRepository:
+    cache_session = get_cache_session()
+    player_repository = get_players_repository_async()
+    return PlayerCacheRepository(
+        cache_session=cache_session,
+        player_repository=player_repository
+    )
+
 def get_wf_api_players_service(
         player_repository = Depends(get_players_repository_async)
 ) -> WFApiPlayer:
     return WFApiPlayer(player_repository=player_repository)
+
+def get_wf_api_players_service_redis(
+        player_repository = Depends(get_players_repository_async),
+        player_cache_repository = Depends(get_player_cache_repository)
+) -> WFApiPlayer:
+    return WFApiPlayer(player_repository= player_repository, player_cache_repository=player_cache_repository)
 
 def get_player_by_name() -> PlayerRepository:
     db_session = get_db_session()

@@ -1,10 +1,13 @@
-import redis
+import asyncio
+from typing import AsyncGenerator
 
-def get_redis_connection() -> redis.Redis:
-    return redis.Redis(
-        host='localhost',
-        port=6379,
-        db=0,
-    )
+import redis.asyncio as redis
 
-c
+from settings import Settings
+
+async def get_cache_session() -> AsyncGenerator[redis.Redis, None]:
+    cache_session = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
+    try:
+        yield cache_session
+    finally:
+        await cache_session.aclose()

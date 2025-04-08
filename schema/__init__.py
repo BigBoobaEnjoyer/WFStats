@@ -1,4 +1,4 @@
 from schema.user import UserLoginSchema, UserCreateSchema
-from schema.player import Player, CreatePlayer, PlayerInfo
+from schema.player import PlayerInfo
 
-__all__ = ['UserLoginSchema', "Player", "UserCreateSchema", "CreatePlayer", "PlayerInfo"]
+__all__ = ['UserLoginSchema',  "UserCreateSchema", "PlayerInfo"]
