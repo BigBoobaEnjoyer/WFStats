@@ -1,28 +1,33 @@
-
 import httpx
 import logging
 
 
-
 from cache.repository import PlayerCacheRepository
+from database.models import Players
 from exceptions.player import PlayerNotFoundException
 from repository.player import PlayerRepository
 from schema.player import PlayerInfo
 
-logger = logging.getLogger(__name__)
 
+logger = logging.getLogger(__name__)
 
 class WFApiPlayer:
 
-    def __init__(self, player_repository, player_cache_repository):
+    def __init__(
+            self,
+            player_repository,
+            player_cache_repository = None
+    ) -> None:
         self.client = httpx.AsyncClient(base_url='https://api.warface.ru')
         self.player_repository: PlayerRepository = player_repository
-        self.player_cache_repository: PlayerCacheRepository = player_cache_repository
+        self.player_cache_repository: PlayerCacheRepository | None = player_cache_repository
 
-    async def get_player_info_from_api_by_name(self, player_name) ->PlayerInfo:
-        response = await self.client.get(url='/user/stat/', params={"name": player_name})
+    async def get_player_info_from_api_by_name(self, player_name: str) -> PlayerInfo:
+        response = await self.client.get(
+            url='/user/stat/',
+            params={"name": player_name}
+        )
         player = response.json()
-
         return PlayerInfo(
             name=player['nickname'],
             pvp_kills=player['kills'],
@@ -32,13 +37,13 @@ class WFApiPlayer:
             pvp_lost=player['pvp_lost']
         )
 
-    async def player_progress_check(self, player_name:str) -> PlayerInfo:
+    async def player_progress_check(self, player_name: str) -> PlayerInfo:
         if not await self.player_repository.get_player_by_name(player_name=player_name):
             raise PlayerNotFoundException(PlayerNotFoundException.detail)
-        current_stat = await self.get_player_info_from_api_by_name(player_name)
-        last_update_stat = await self.player_repository.get_player_by_name(player_name)
+        current_stat: PlayerInfo = await self.get_player_info_from_api_by_name(player_name)
+        last_update_stat: PlayerInfo = await self.player_repository.get_player_by_name(player_name)
         if (current_stat.pvp_death - last_update_stat.pvp_death) != 0:
-            kd = round((current_stat.pvp_kills - last_update_stat.pvp_kills)
+            kd: float = round((current_stat.pvp_kills - last_update_stat.pvp_kills)
                           /(current_stat.pvp_death - last_update_stat.pvp_death), 2)
         else:
             kd = 0
@@ -52,17 +57,17 @@ class WFApiPlayer:
         )
 
     async def update_all_players_stat(self):
-        all_players = await self.player_repository.get_all_player_names()
+        all_players: set[str] = await self.player_repository.get_all_player_names()
         for player_name in all_players:
-            new_stat = await self.get_player_info_from_api_by_name(player_name)
+            new_stat: PlayerInfo = await self.get_player_info_from_api_by_name(player_name)
             await self.player_repository.update_player_stat(
                 player_name=player_name,
                 new_stat=new_stat
             )
 
-    async def get_user_stat(self, user_id: int):
-        players = await self.player_repository.get_all_players_of_user(user_id)
-        user_stat = PlayerInfo(
+    async def get_user_stat(self, user_id: int) -> PlayerInfo:
+        players: list[Players] = await self.player_repository.get_all_players_of_user(user_id)
+        user_stat: PlayerInfo = PlayerInfo(
             name='',
             pvp_kills=0,
             pvp_death=0,
@@ -81,8 +86,8 @@ class WFApiPlayer:
         return user_stat
 
     async def current_user_stat(self, user_id) -> PlayerInfo:
-        player_names = await self.player_repository.get_all_user_player_names(user_id)
-        user_stat = PlayerInfo(
+        player_names: set[str] = await self.player_repository.get_all_user_player_names(user_id)
+        user_stat: PlayerInfo = PlayerInfo(
             name='',
             pvp_kills=0,
             pvp_death=0,
@@ -101,7 +106,7 @@ class WFApiPlayer:
                 user_stat.pvp_kd = round(user_stat.pvp_kills / user_stat.pvp_death, 2)
         return user_stat
 
-    async def get_user_progress(self, user_id: int):
+    async def get_user_progress(self, user_id: int) -> PlayerInfo | None:
         current_stat = await self.current_user_stat(user_id)
         last_update_stat = await self.get_user_stat(user_id)
         user_stat = PlayerInfo(
@@ -116,6 +121,6 @@ class WFApiPlayer:
             user_stat.pvp_kd = round(user_stat.pvp_kills / user_stat.pvp_death, 2)
             return user_stat
 
-    async def get_all_players(self):
+    async def get_all_players(self) -> set[PlayerInfo] | None:
         players = await self.player_cache_repository.get_all_players()
         return players

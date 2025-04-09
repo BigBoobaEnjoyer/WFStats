@@ -1,7 +1,7 @@
 
 from sqlalchemy import select, delete
 from sqlalchemy.dialects.mysql import insert
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, Mapped
 from sqlalchemy.ext.asyncio import AsyncSession
 import logging
 
@@ -19,7 +19,7 @@ class PlayerRepository:
         self.db_session = db_session
 
     async def get_all_players(self) :
-        query = select(Players )
+        query = select(Players)
         async with self.db_session() as session:
             players: list[Players] = (await session.execute(query)).scalars().all()
             print(type(players))
