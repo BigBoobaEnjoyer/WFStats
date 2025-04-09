@@ -1,12 +1,12 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
 
-from dependecy import (get_request_user_id, get_wf_api_players_service,
-     get_players_repository_async, get_wf_api_players_service_redis)
-from exceptions.player import PlayerNotFoundException
-from repository import PlayerRepository
-from schema import PlayerInfo
-from service.players import  WFApiPlayer
+from app.dependecy import (get_request_user_id, get_wf_api_players_service,
+                           get_players_repository_async, get_wf_api_players_service_redis)
+from app.exceptions.player import PlayerNotFoundException
+from app.repository import PlayerRepository
+from app.schema import PlayerInfo
+from app.service.players import  WFApiPlayer
 
 
 router = APIRouter(prefix="/players", tags=["players"])

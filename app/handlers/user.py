@@ -2,10 +2,10 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from dependecy import get_user_service
-from exceptions.user import UsernameIsTakenException
-from schema.user import UserLoginSchema, UserCreateSchema
-from service.user import UserService
+from app.dependecy import get_user_service
+from app.exceptions.user import UsernameIsTakenException
+from app.schema.user import UserLoginSchema, UserCreateSchema
+from app.service.user import UserService
 
 router = APIRouter(prefix='/user', tags=["user"])
 

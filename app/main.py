@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 import logging
 
-from handlers import routers
+from app.handlers import routers
 
 
 app = FastAPI()

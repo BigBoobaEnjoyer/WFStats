@@ -1,14 +1,14 @@
 
 from sqlalchemy import select, delete
 from sqlalchemy.dialects.mysql import insert
-from sqlalchemy.orm import Session, Mapped
+from sqlalchemy.orm import Session
 from sqlalchemy.ext.asyncio import AsyncSession
 import logging
 
 
-from database.models import Players
-from schema import PlayerInfo
-from exceptions.player import PlayerNotFoundException
+from app.infrastracture.database.models import Players
+from app.schema import PlayerInfo
+from app.exceptions.player import PlayerNotFoundException
 
 logger = logging.getLogger(__name__)
 

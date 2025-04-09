@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 
 
-from repository.user import UserRepository
-from schema.user import UserLoginSchema
-from service.auth import AuthService
-from exceptions.user import UsernameIsTakenException
+from app.repository import UserRepository
+from app.schema.user import UserLoginSchema
+from app.service.auth import AuthService
+from app.exceptions.user import UsernameIsTakenException
 
 
 @dataclass

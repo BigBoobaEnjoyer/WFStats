@@ -3,12 +3,12 @@ import datetime
 
 from jose import jwt, JWTError
 
-from exceptions.auth import IncorrectAuthPasswordException, TokenExpired, TokenIncorrect
-from exceptions.user import UserNotFoundException
-from database.models import UserProfile
-from schema.user import UserLoginSchema
-from repository.user import UserRepository
-from settings import Settings
+from app.exceptions.auth import IncorrectAuthPasswordException, TokenExpired, TokenIncorrect
+from app.exceptions.user import UserNotFoundException
+from app.infrastracture.database.models import UserProfile
+from app.schema.user import UserLoginSchema
+from app.repository import UserRepository
+from app.settings import Settings
 
 @dataclass
 class AuthService:

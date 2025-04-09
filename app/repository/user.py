@@ -3,8 +3,7 @@ from sqlalchemy.orm import Session
 
 from dataclasses import dataclass
 
-from exceptions.user import UsernameIsTakenException
-from database.models import UserProfile
+from app.infrastracture.database.models import UserProfile
 
 
 @dataclass

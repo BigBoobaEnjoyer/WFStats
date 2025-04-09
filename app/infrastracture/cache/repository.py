@@ -1,12 +1,9 @@
-import asyncio
 import json
 import logging
 
-from redis.asyncio import Redis
-
-from database.models import Players
-from schema import PlayerInfo
-from repository.player import PlayerRepository
+from app.infrastracture.database.models import Players
+from app.schema import PlayerInfo
+from app.repository import PlayerRepository
 logger = logging.getLogger(__name__)
 
 class PlayerCacheRepository:
