@@ -41,7 +41,7 @@ def get_wf_api_players_service_redis(
 ) -> WFApiPlayer:
     return WFApiPlayer(player_repository= player_repository, player_cache_repository=player_cache_repository)
 
-def get_user_repository(db_session: Session = Depends(get_db_session)) -> UserRepository:
+def get_user_repository(db_session: Session = Depends(get_async_db_session)) -> UserRepository:
     return UserRepository(db_session=db_session)
 
 def get_auth_service(user_repository: UserRepository = Depends(get_user_repository)) -> AuthService:

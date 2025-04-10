@@ -1,3 +1,5 @@
+from bcrypt import checkpw
+
 from dataclasses import dataclass
 import datetime
 
@@ -12,18 +14,20 @@ from app.settings import Settings
 
 @dataclass
 class AuthService:
+
     user_repository: UserRepository
     settings: Settings
-    def login(self, username:str, password:str) -> UserLoginSchema:
-        user: UserProfile = self.user_repository.get_user_by_username(username)
-        access_token = self.generate_access_token(user_id=user.id)
+
+    async def login(self, username:str, password:str) -> UserLoginSchema:
+        user: UserProfile = await self.user_repository.get_user_by_username(username)
+        access_token = await self.generate_access_token(user_id=user.id)
         if not user:
             raise UserNotFoundException(UserNotFoundException.detail)
-        elif user.password != password:
+        elif not checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
             raise IncorrectAuthPasswordException
         return UserLoginSchema(user_id=user.id, access_token=access_token)
 
-    def generate_access_token(self, user_id: int) -> str:
+    async def generate_access_token(self, user_id: int) -> str:
         expires_date_unix = (datetime.datetime.now(datetime.UTC) + datetime.timedelta(weeks=1)).timestamp()
         token = jwt.encode(
             {'user_id': user_id, 'expire': expires_date_unix},
@@ -32,7 +36,7 @@ class AuthService:
         )
         return token
 
-    def get_user_id_from_access_token(self, access_token: str ) -> int:
+    async def get_user_id_from_access_token(self, access_token: str ) -> int:
         try:
             payload = jwt.decode(
             token=access_token,

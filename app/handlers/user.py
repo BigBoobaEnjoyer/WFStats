@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.dependecy import get_user_service
-from app.exceptions.user import UsernameIsTakenException
+from app.exceptions.user import UsernameIsTakenException, WeakPasswordException
 from app.schema.user import UserLoginSchema, UserCreateSchema
 from app.service.user import UserService
 
@@ -23,10 +23,18 @@ async def create_user(
     :return: Логин + JWT. UserLoginSchema
     """
     try:
-        user_service.check_username_uniq(username=body.username)
+        await user_service.check_username_uniq(username=body.username)
     except UsernameIsTakenException as e:
         raise HTTPException(
             status_code=401,
             detail=e.detail
         )
-    return user_service.create_user(body.username, body.password)
+
+    try:
+        user = await user_service.create_user(body.username, body.password)
+    except WeakPasswordException as e:
+        raise HTTPException(
+            status_code=401,
+            detail=e.detail
+        )
+    return user

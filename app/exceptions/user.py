@@ -3,3 +3,6 @@ class UserNotFoundException(Exception):
 
 class UsernameIsTakenException(Exception):
     detail = "Incorrect username"
+
+class WeakPasswordException(Exception):
+    detail = "Weak password"
