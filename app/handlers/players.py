@@ -1,12 +1,12 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
 
-from app.dependecy import (get_request_user_id, get_wf_api_players_service,
-                           get_players_repository_async, get_wf_api_players_service_redis)
-from app.exceptions.player import PlayerNotFoundException
-from app.repository import PlayerRepository
-from app.schema import PlayerInfo
-from app.service.players import  WFApiPlayer
+from app.dependecy import (get_request_user_id, get_player_service,
+    get_players_repository_async, get_player_service_redis)
+from app.modules.player.exceptions import PlayerNotFoundException
+from app.modules.player import PlayerRepository
+from app.modules.player import PlayerInfo
+from app.modules.player import  PlayerService
 
 
 router = APIRouter(prefix="/players", tags=["players"])
@@ -14,7 +14,7 @@ router = APIRouter(prefix="/players", tags=["players"])
 @router.post('/new')
 async def create_player(
         player_name: str,
-        wf_api_player_service: Annotated[WFApiPlayer, Depends(get_wf_api_players_service)],
+        wf_api_player_service: Annotated[PlayerService, Depends(get_player_service)],
         player_repository: Annotated[PlayerRepository, Depends(get_players_repository_async)],
         user_id:int = Depends(get_request_user_id)
 ) -> PlayerInfo:
@@ -69,7 +69,7 @@ async def delete_player(
 @router.get('/search_player', response_model=PlayerInfo)
 async def search_player(
         player_name: str,
-        wf_player_api_service: Annotated[WFApiPlayer, Depends(get_wf_api_players_service)],
+        wf_player_api_service: Annotated[PlayerService, Depends(get_player_service)],
 ) -> PlayerInfo:
     """
     Поиск существующего игрока в Warface по сторонней публичной API
@@ -91,7 +91,7 @@ async def search_player(
 
 @router.get("/get_all_players")
 async def get_all_players(
-        wf_player_api_service: Annotated[WFApiPlayer, Depends(get_wf_api_players_service_redis)]
+        wf_player_api_service: Annotated[PlayerService, Depends(get_player_service_redis)]
 ) -> set[PlayerInfo]:
     """
     Возвращает список всех игроков, информация о которых есть в бд. Исключает дубликаты
@@ -105,7 +105,7 @@ async def get_all_players(
 
 @router.get('/player_progress_check')
 async def player_progress_check(
-        wf_player_api_service: Annotated[WFApiPlayer, Depends(get_wf_api_players_service)],
+        wf_player_api_service: Annotated[PlayerService, Depends(get_player_service)],
         player_name: str
 ) -> PlayerInfo:
     """
@@ -137,7 +137,7 @@ async def get_all_player_names(
 
 @router.get('/user_stat')
 async def get_user_stat(
-        wf_player_api_service: Annotated[WFApiPlayer, Depends(get_wf_api_players_service)],
+        wf_player_api_service: Annotated[PlayerService, Depends(get_player_service)],
         user_id: int = Depends(get_request_user_id)
 ) -> PlayerInfo:
     """
@@ -152,7 +152,7 @@ async def get_user_stat(
 
 @router.get('/get_player_current_stat')
 async def get_current_user_stat(
-        wf_player_api_service: Annotated[WFApiPlayer, Depends(get_wf_api_players_service)],
+        wf_player_api_service: Annotated[PlayerService, Depends(get_player_service)],
         user_id: int = Depends(get_request_user_id)
 ) -> PlayerInfo:
     """
@@ -166,7 +166,7 @@ async def get_current_user_stat(
 
 @router.get('/get_user_progress')
 async def get_user_progress(
-        wf_player_api_service: Annotated[WFApiPlayer, Depends(get_wf_api_players_service)],
+        wf_player_api_service: Annotated[PlayerService, Depends(get_player_service)],
         user_id: int = Depends(get_request_user_id)
 ) -> PlayerInfo:
     """
@@ -181,7 +181,7 @@ async def get_user_progress(
 @router.put("/update_player_stat")
 async def update_player_stat(
         player_repository: Annotated[PlayerRepository, Depends(get_players_repository_async)],
-        wf_player_api_service: Annotated[WFApiPlayer, Depends(get_wf_api_players_service)],
+        wf_player_api_service: Annotated[PlayerService, Depends(get_player_service)],
         player_name: str
 ) -> None:
     """
@@ -199,7 +199,7 @@ async def update_player_stat(
 
 @router.put('/update_all_players_stat')
 async def update_all_players_stat(
-        wf_player_api_service: Annotated[WFApiPlayer, Depends(get_wf_api_players_service)]
+        wf_player_api_service: Annotated[PlayerService, Depends(get_player_service)]
 ) -> None:
     """
     Массовое обновление статистики для всех персонажей.

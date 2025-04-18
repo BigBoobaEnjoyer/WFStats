@@ -1,16 +1,17 @@
-version: '3.9'
 
 services:
-  postgres:
+  db:
     image: postgres:latest
-    container_name: postgres_container
+    container_name: db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: penis
       POSTGRES_DB: wfstats
       PGDATA: /var/lib/postgresql/data/pgdata
     ports:
-      - "5430:5432"
+      - "5432:5432"
+    networks:
+      - "Vova"
     volumes:
       - ./pgdata:/var/lib/postgresql/data/pgdata
     deploy:
@@ -47,3 +48,6 @@ services:
 volumes:
   pgdata:
     driver: local
+
+networks:
+  Vova:

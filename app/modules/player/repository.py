@@ -1,21 +1,20 @@
 
 from sqlalchemy import select, delete
 from sqlalchemy.dialects.mysql import insert
-from sqlalchemy.orm import Session
 from sqlalchemy.ext.asyncio import AsyncSession
 import logging
 
 
 from app.infrastracture.database.models import Players
-from app.schema import PlayerInfo
-from app.exceptions.player import PlayerNotFoundException
+from app.modules.player.schema import PlayerInfo
+from app.modules.player.exceptions import PlayerNotFoundException
 
 logger = logging.getLogger(__name__)
 
 
 class PlayerRepository:
 
-    def __init__(self, db_session: Session | AsyncSession):
+    def __init__(self, db_session: AsyncSession):
         self.db_session = db_session
 
     async def get_all_players(self) :

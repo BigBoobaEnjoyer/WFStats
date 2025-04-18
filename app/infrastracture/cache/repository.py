@@ -2,8 +2,8 @@ import json
 import logging
 
 from app.infrastracture.database.models import Players
-from app.schema import PlayerInfo
-from app.repository import PlayerRepository
+from app.modules.player import PlayerInfo
+from app.modules.player import PlayerRepository
 logger = logging.getLogger(__name__)
 
 class PlayerCacheRepository:

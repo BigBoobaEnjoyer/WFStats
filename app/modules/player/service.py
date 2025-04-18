@@ -4,14 +4,14 @@ import logging
 
 from app.infrastracture.cache.repository import PlayerCacheRepository
 from app.infrastracture.database.models import Players
-from app.exceptions.player import PlayerNotFoundException
-from app.repository import PlayerRepository
-from app.schema.player import PlayerInfo
+from app.modules.player import PlayerNotFoundException
+from app.modules.player import PlayerRepository
+from app.modules.player import PlayerInfo
 
 
 logger = logging.getLogger(__name__)
 
-class WFApiPlayer:
+class PlayerService:
 
     def __init__(
             self,

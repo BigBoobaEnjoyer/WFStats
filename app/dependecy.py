@@ -2,21 +2,18 @@ from fastapi import Depends, security, HTTPException
 from fastapi.params import Security
 from sqlalchemy.orm import Session
 
+from app.modules.user import (
+    UserRepository, AuthService, UserService, TokenIncorrect,
+    TokenExpired)
+from app.modules.player import (
+    PlayerRepository, PlayerService
+)
+
 from app.infrastracture.cache.repository import PlayerCacheRepository
-from app.infrastracture.database.database import get_db_session, get_async_db_session
-from app.exceptions.auth import TokenExpired, TokenIncorrect
-from app.repository.player import PlayerRepository
-from app.repository.user import UserRepository
-from app.service.auth import AuthService
-from app.service.players import WFApiPlayer
-from app.service.user import UserService
+from app.infrastracture.database.database import  get_async_db_session
 from app.settings import Settings
 from app.infrastracture.cache.accessor import get_cache_session
 
-
-def get_players_repository() -> PlayerRepository:
-    db_session = get_db_session()
-    return PlayerRepository(db_session)
 
 def get_players_repository_async() -> PlayerRepository:
     db_session = get_async_db_session()
@@ -30,16 +27,16 @@ def get_player_cache_repository() -> PlayerCacheRepository:
         player_repository=player_repository
     )
 
-def get_wf_api_players_service(
+def get_player_service(
         player_repository = Depends(get_players_repository_async)
-) -> WFApiPlayer:
-    return WFApiPlayer(player_repository=player_repository)
+) -> PlayerService:
+    return PlayerService(player_repository=player_repository)
 
-def get_wf_api_players_service_redis(
+def get_player_service_redis(
         player_repository = Depends(get_players_repository_async),
         player_cache_repository = Depends(get_player_cache_repository)
-) -> WFApiPlayer:
-    return WFApiPlayer(player_repository= player_repository, player_cache_repository=player_cache_repository)
+) -> PlayerService:
+    return PlayerService(player_repository= player_repository, player_cache_repository=player_cache_repository)
 
 def get_user_repository(db_session: Session = Depends(get_async_db_session)) -> UserRepository:
     return UserRepository(db_session=db_session)
@@ -71,4 +68,4 @@ def get_request_user_id(
             status_code=401,
             detail= e.detail
         )
-    return user_id
+    return awa
